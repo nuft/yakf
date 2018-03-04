@@ -29,7 +29,7 @@ private:
         ValueType dx;
         ValueType &x = xout;
         for (x = x0; time_span > 0; time_span -= h) {
-            f(x, dx);
+            dx = f(x);
             x += h * dx;
         }
     }
@@ -40,10 +40,10 @@ private:
         ValueType k1, k2, k3, k4;
         ValueType &x = xout;
         for (x = x0; time_span > 0; time_span -= h) {
-            f(x, k1);
-            f(x + h / 2 * k1, k2);
-            f(x + h / 2 * k2, k3);
-            f(x + h  * k3, k4);
+            k1 = f(x);
+            k2 = f(x + h / 2 * k1);
+            k3 = f(x + h / 2 * k2);
+            k4 = f(x + h  * k3);
             x += h / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
         }
     }

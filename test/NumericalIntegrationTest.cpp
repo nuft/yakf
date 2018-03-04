@@ -6,7 +6,7 @@ using namespace kalmanfilter;
 
 struct ZeroDynamics
 {
-    void operator()(const double &x, double &dx) const {dx = 0.0;}
+    double operator()(const double &x) const {return 0.0;}
 };
 
 TEST(EulerTestCase, TestZeroDynamics) {
@@ -27,7 +27,7 @@ TEST(RungeKuttaTestCase, TestZeroDynamics) {
 
 struct ConstDynamics
 {
-    void operator()(const double &x, double &dx) const {dx = 21.0;}
+    double operator()(const double &x) const {return 21.0;}
 };
 
 TEST(EulerTestCase, TestConstDynamics) {
@@ -49,9 +49,9 @@ TEST(RungeKuttaTestCase, TestConstDynamics) {
 using Vec2d = Eigen::Vector2d;
 struct FreeFall
 {
-    void operator()(const Vec2d &x, Vec2d &dx) const {
-        dx[0] = x[1];
-        dx[1] = -9.81;
+    Vec2d operator()(const Vec2d &x) const {
+        Vec2d dx(x[1], -9.81);
+        return dx;
     }
 };
 
