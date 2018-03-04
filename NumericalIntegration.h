@@ -24,21 +24,20 @@ private:
     Functor f;
 
     // Explicit Euler method
-    inline void Euler(Scalar time_span, const ValueType &x0, ValueType &xout)
+    inline ValueType Euler(Scalar time_span, const ValueType &x0)
     {
-        ValueType dx;
-        ValueType &x = xout;
+        ValueType x, dx;
         for (x = x0; time_span > 0; time_span -= h) {
             dx = f(x);
             x += h * dx;
         }
+        return x;
     }
 
     // 4th order Runge-Kutta (RK4) method
-    inline void RungeKutta4(Scalar time_span, const ValueType &x0, ValueType &xout)
+    inline ValueType RungeKutta4(Scalar time_span, const ValueType &x0)
     {
-        ValueType k1, k2, k3, k4;
-        ValueType &x = xout;
+        ValueType x, k1, k2, k3, k4;
         for (x = x0; time_span > 0; time_span -= h) {
             k1 = f(x);
             k2 = f(x + h / 2 * k1);
@@ -46,6 +45,7 @@ private:
             k4 = f(x + h  * k3);
             x += h / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
         }
+        return x;
     }
 
 public:
@@ -59,22 +59,17 @@ public:
     /** Integrate given functor
      * \param time_span integration time span
      * \param x0 initial value
-     * \param xout integration result
+     * \return integration result
      */
-    void integrate(Scalar time_span, const ValueType &x0, ValueType &xout)
+    ValueType integrate(Scalar time_span, const ValueType &x0)
     {
         switch (mode) {
             case EULER:
-                Euler(time_span, x0, xout);
-                break;
+                return Euler(time_span, x0);
 
-            case RK4:
-                RungeKutta4(time_span, x0, xout);
-                break;
-
+            case RK4: // fall through
             default:
-                // XXX TODO: error handling
-                break;
+                return RungeKutta4(time_span, x0);
         }
     }
 };
