@@ -1,30 +1,30 @@
 #ifndef NUMERICALINTEGRATION_H
 #define NUMERICALINTEGRATION_H
 
-namespace KalmanFilter {
+namespace kalmanfilter {
 
 enum IntegrationMode {
-    Euler,
-    RungeKutta
+    EULER,
+    RK4
 };
 
 /** Numerical integrator class template
  * \param Functor function to be integrated
  * \param ValueType input and output type of the functor
  * \param Scalar scalar type, double or float
- * \param IntegrationMode choose Euler or RungeKutta method
+ * \param IntegrationMode choose EULER or RK4 method
  */
 template<typename Functor,
          typename ValueType,
          typename Scalar,
-         IntegrationMode mode = Euler>
+         IntegrationMode mode = EULER>
 class NumericalIntegration {
 private:
     const Scalar h;
     Functor f;
 
-    // forward Euler method
-    inline void ForwardEuler(Scalar time_span, const ValueType &x0, ValueType &xout)
+    // Explicit Euler method
+    inline void Euler(Scalar time_span, const ValueType &x0, ValueType &xout)
     {
         ValueType dx;
         ValueType &x = xout;
@@ -35,7 +35,7 @@ private:
     }
 
     // 4th order Runge-Kutta (RK4) method
-    inline void RK4(Scalar time_span, const ValueType &x0, ValueType &xout)
+    inline void RungeKutta4(Scalar time_span, const ValueType &x0, ValueType &xout)
     {
         ValueType k1, k2, k3, k4;
         ValueType &x = xout;
@@ -64,12 +64,12 @@ public:
     void integrate(Scalar time_span, const ValueType &x0, ValueType &xout)
     {
         switch (mode) {
-            case Euler:
-                ForwardEuler(time_span, x0, xout);
+            case EULER:
+                Euler(time_span, x0, xout);
                 break;
 
-            case RungeKutta:
-                RK4(time_span, x0, xout);
+            case RK4:
+                RungeKutta4(time_span, x0, xout);
                 break;
 
             default:
@@ -79,6 +79,6 @@ public:
     }
 };
 
-} // end namespace KalmanFilter
+} // end namespace kalmanfilter
 
 #endif // NUMERICALINTEGRATION_H
