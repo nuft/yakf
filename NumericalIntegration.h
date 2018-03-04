@@ -18,7 +18,7 @@ template<typename Functor,
          typename ValueType,
          typename Scalar,
          IntegrationMode mode = EULER>
-class NumericalIntegration {
+class NumericalIntegration : public Functor {
 private:
     const Scalar h;
     Functor f;
