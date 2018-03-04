@@ -5,35 +5,33 @@ namespace KalmanFilter {
 
 enum IntegrationMode {
     Euler,
-    RK4
+    RungeKutta
 };
 
 template<typename Functor,
          typename ValueType,
          typename Scalar,
-         Scalar TimeStep,
          IntegrationMode mode = Euler>
 class NumericalIntegration {
 private:
+    const Scalar h;
     Functor f;
 
-    inline void EulerForward(Scalar tspan, const ValueType &x0, ValueType &x)
+    // forward Euler method
+    inline void ForwardEuler(Scalar time_span, const ValueType &x0, ValueType &x)
     {
         ValueType dx;
-        const Scalar h = TimeStep;
-        for (x = x0; tspan > 0; tspan -= h) {
-            // Euler forward
+        for (x = x0; time_span > 0; time_span -= h) {
             f(x, dx);
             x += h * dx;
         }
     }
 
-    inline void RK4(Scalar tspan, const ValueType &x0, ValueType &x)
+    // 4th order Runge-Kutta (RK4) method
+    inline void RK4(Scalar time_span, const ValueType &x0, ValueType &x)
     {
         ValueType k1, k2, k3, k4;
-        const Scalar h = TimeStep;
-        for (; tspan > 0; tspan -= h) {
-            // classical Runge-Kutta (RK4)
+        for (x = x0; time_span > 0; time_span -= h) {
             f(x, k1);
             f(x + h / 2 * k1, k2);
             f(x + h / 2 * k2, k3);
@@ -43,15 +41,17 @@ private:
     }
 
 public:
-    void integrate(Scalar tspan, const ValueType &x0, ValueType &x)
+    NumericalIntegration(Scalar time_step) : h(time_step) {}
+
+    void integrate(Scalar time_span, const ValueType &x0, ValueType &x)
     {
         switch (mode) {
             case Euler:
-                EulerForward(tspan, x0, x);
+                ForwardEuler(time_span, x0, x);
                 break;
 
-            case RK4:
-                RK4(tspan, x0, x);
+            case RungeKutta:
+                RK4(time_span, x0, x);
                 break;
 
             default:

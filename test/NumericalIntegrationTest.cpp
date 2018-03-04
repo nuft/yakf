@@ -10,7 +10,7 @@ struct ZeroDynamics
 };
 
 TEST(EulerTest, TestZeroDynamics) {
-    NumericalIntegration<ZeroDynamics, double, double, 1e-3, Euler> ni;
+    NumericalIntegration<ZeroDynamics, double, double, Euler> ni(1e-3);
     double res;
     const double x0 = 42;
     ni.integrate(1, x0, res);
@@ -23,7 +23,7 @@ struct ConstDynamics
 };
 
 TEST(EulerTest, TestConstDynamics) {
-    NumericalIntegration<ConstDynamics, double, double, 1e-3, Euler> ni;
+    NumericalIntegration<ConstDynamics, double, double, Euler> ni(1e-3);
     double res;
     const double x0 = 0;
     ni.integrate(2, x0, res);
@@ -40,7 +40,7 @@ struct FreeFall
 };
 
 TEST(EulerTest, TestMultivariateIntegration) {
-    NumericalIntegration<FreeFall, Vec2d, double, 1e-3, Euler> ni;
+    NumericalIntegration<FreeFall, Vec2d, double, Euler> ni(1e-3);
     Vec2d res;
     const Vec2d x0(0, 0);
     double delta_t = 3.0;
