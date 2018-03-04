@@ -9,8 +9,16 @@ struct ZeroDynamics
     void operator()(const double &x, double &dx) const {dx = 0.0;}
 };
 
-TEST(EulerTest, TestZeroDynamics) {
+TEST(EulerTestCase, TestZeroDynamics) {
     NumericalIntegration<ZeroDynamics, double, double, Euler> ni(1e-3);
+    double res;
+    const double x0 = 42;
+    ni.integrate(1, x0, res);
+    ASSERT_EQ(x0, res);
+}
+
+TEST(RungeKuttaTestCase, TestZeroDynamics) {
+    NumericalIntegration<ZeroDynamics, double, double, RungeKutta> ni(1e-3);
     double res;
     const double x0 = 42;
     ni.integrate(1, x0, res);
@@ -22,8 +30,16 @@ struct ConstDynamics
     void operator()(const double &x, double &dx) const {dx = 21.0;}
 };
 
-TEST(EulerTest, TestConstDynamics) {
+TEST(EulerTestCase, TestConstDynamics) {
     NumericalIntegration<ConstDynamics, double, double, Euler> ni(1e-3);
+    double res;
+    const double x0 = 0;
+    ni.integrate(2, x0, res);
+    EXPECT_NEAR(42.0, res, 0.1);
+}
+
+TEST(RungeKuttaTestCase, TestConstDynamics) {
+    NumericalIntegration<ConstDynamics, double, double, RungeKutta> ni(1e-3);
     double res;
     const double x0 = 0;
     ni.integrate(2, x0, res);
@@ -39,12 +55,22 @@ struct FreeFall
     }
 };
 
-TEST(EulerTest, TestMultivariateIntegration) {
-    NumericalIntegration<FreeFall, Vec2d, double, Euler> ni(1e-3);
+TEST(EulerTestCase, TestMultivariateIntegration) {
+    NumericalIntegration<FreeFall, Vec2d, double, Euler> ni(0.01);
     Vec2d res;
     const Vec2d x0(0, 0);
     double delta_t = 3.0;
-    ni.integrate(3, x0, res);
+    ni.integrate(delta_t, x0, res);
     EXPECT_NEAR(-0.5*9.81*delta_t*delta_t, res[0], 1.0);
     EXPECT_NEAR(-9.81*delta_t, res[1], 1.0);
+}
+
+TEST(RungeKuttaTestCase, TestMultivariateIntegration) {
+    NumericalIntegration<FreeFall, Vec2d, double, RungeKutta> ni(0.1);
+    Vec2d res;
+    const Vec2d x0(0, 0);
+    double delta_t = 3.0;
+    ni.integrate(delta_t, x0, res);
+    EXPECT_NEAR(-0.5*9.81*delta_t*delta_t, res[0], 1e-6);
+    EXPECT_NEAR(-9.81*delta_t, res[1], 1e-6);
 }
