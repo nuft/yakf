@@ -14,11 +14,12 @@ enum IntegrationMode {
  * \param Scalar scalar type, double or float
  * \param IntegrationMode choose EULER or RK4 method
  */
-template<typename Functor,
-         typename ValueType,
-         typename Scalar,
-         IntegrationMode mode = EULER>
-class NumericalIntegration : public Functor {
+template<typename _Functor, IntegrationMode mode = EULER>
+class NumericalIntegration : public _Functor {
+public:
+    using Functor = _Functor;
+    using ValueType = typename Functor::ValueType;
+    using Scalar = typename Functor::Scalar;
 private:
     const Scalar h;
     Functor f;

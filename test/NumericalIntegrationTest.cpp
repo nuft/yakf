@@ -6,11 +6,13 @@ using namespace kalmanfilter;
 
 struct ZeroDynamics
 {
+    using ValueType = double;
+    using Scalar = double;
     double operator()(const double &x) const {return 0.0;}
 };
 
 TEST(EulerTestCase, TestZeroDynamics) {
-    NumericalIntegration<ZeroDynamics, double, double, EULER> ni(1e-3);
+    NumericalIntegration<ZeroDynamics, EULER> ni(1e-3);
     double res;
     const double x0 = 42;
     res = ni.integrate(1, x0);
@@ -18,7 +20,7 @@ TEST(EulerTestCase, TestZeroDynamics) {
 }
 
 TEST(RungeKuttaTestCase, TestZeroDynamics) {
-    NumericalIntegration<ZeroDynamics, double, double, RK4> ni(1e-3);
+    NumericalIntegration<ZeroDynamics, RK4> ni(1e-3);
     double res;
     const double x0 = 42;
     res = ni.integrate(1, x0);
@@ -27,11 +29,13 @@ TEST(RungeKuttaTestCase, TestZeroDynamics) {
 
 struct ConstDynamics
 {
+    using ValueType = double;
+    using Scalar = double;
     double operator()(const double &x) const {return 21.0;}
 };
 
 TEST(EulerTestCase, TestConstDynamics) {
-    NumericalIntegration<ConstDynamics, double, double, EULER> ni(1e-3);
+    NumericalIntegration<ConstDynamics, EULER> ni(1e-3);
     double res;
     const double x0 = 0;
     res = ni.integrate(2, x0);
@@ -39,7 +43,7 @@ TEST(EulerTestCase, TestConstDynamics) {
 }
 
 TEST(RungeKuttaTestCase, TestConstDynamics) {
-    NumericalIntegration<ConstDynamics, double, double, RK4> ni(1e-3);
+    NumericalIntegration<ConstDynamics, RK4> ni(1e-3);
     double res;
     const double x0 = 0;
     res = ni.integrate(2, x0);
@@ -49,6 +53,8 @@ TEST(RungeKuttaTestCase, TestConstDynamics) {
 using Vec2d = Eigen::Vector2d;
 struct FreeFall
 {
+    using ValueType = Vec2d;
+    using Scalar = double;
     Vec2d operator()(const Vec2d &x) const {
         Vec2d dx(x[1], -9.81);
         return dx;
@@ -56,7 +62,7 @@ struct FreeFall
 };
 
 TEST(EulerTestCase, TestMultivariateIntegration) {
-    NumericalIntegration<FreeFall, Vec2d, double, EULER> ni(0.01);
+    NumericalIntegration<FreeFall, EULER> ni(0.01);
     Vec2d res;
     const Vec2d x0(0, 0);
     double delta_t = 3.0;
@@ -66,7 +72,7 @@ TEST(EulerTestCase, TestMultivariateIntegration) {
 }
 
 TEST(RungeKuttaTestCase, TestMultivariateIntegration) {
-    NumericalIntegration<FreeFall, Vec2d, double, RK4> ni(0.1);
+    NumericalIntegration<FreeFall, RK4> ni(0.1);
     Vec2d res;
     const Vec2d x0(0, 0);
     double delta_t = 3.0;
