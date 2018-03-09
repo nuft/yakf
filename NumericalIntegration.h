@@ -14,21 +14,18 @@ enum IntegrationMode {
  * \param Scalar scalar type, double or float
  * \param IntegrationMode choose EULER or RK4 method
  */
-template<typename _Functor, IntegrationMode mode = EULER>
-class NumericalIntegration : public _Functor {
+template<typename Functor, IntegrationMode mode = EULER>
+class NumericalIntegration : public Functor {
 public:
-    using Functor = _Functor;
     using ValueType = typename Functor::ValueType;
     using Scalar = typename Functor::Scalar;
 private:
-    Functor f;
-
     // Explicit Euler method
     inline ValueType Euler(Scalar time_span, Scalar step, const ValueType &x0)
     {
         ValueType x, dx;
         for (x = x0; time_span > 0; time_span -= step) {
-            dx = f(x);
+            dx = this->operator()(x);
             x += step * dx;
         }
         return x;
@@ -39,10 +36,10 @@ private:
     {
         ValueType x, k1, k2, k3, k4;
         for (x = x0; time_span > 0; time_span -= step) {
-            k1 = f(x);
-            k2 = f(x + step / 2 * k1);
-            k3 = f(x + step / 2 * k2);
-            k4 = f(x + step  * k3);
+            k1 = this->operator()(x);
+            k2 = this->operator()(x + step / 2 * k1);
+            k3 = this->operator()(x + step / 2 * k2);
+            k4 = this->operator()(x + step  * k3);
             x += step / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
         }
         return x;
