@@ -10,8 +10,6 @@ enum IntegrationMode {
 
 /** Numerical integrator class template
  * \param Functor function to be integrated
- * \param ValueType input and output type of the functor
- * \param Scalar scalar type, double or float
  * \param IntegrationMode choose EULER or RK4 method
  */
 template<typename Functor, IntegrationMode mode = EULER>
