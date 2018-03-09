@@ -15,29 +15,36 @@ enum IntegrationMode {
 template<typename Functor, IntegrationMode mode = EULER>
 class NumericalIntegration : public Functor {
 public:
-    using ValueType = typename Functor::ValueType;
+    using State = typename Functor::State;
+    using Control = typename Functor::Control;
     using Scalar = typename Functor::Scalar;
 private:
     // Explicit Euler method
-    inline ValueType Euler(Scalar time_span, Scalar step, const ValueType &x0)
+    inline State Euler(Scalar time_span,
+                           Scalar step,
+                           const State &x0,
+                           const Control &u)
     {
-        ValueType x, dx;
+        State x, dx;
         for (x = x0; time_span > 0; time_span -= step) {
-            dx = this->operator()(x);
+            dx = this->operator()(x, u);
             x += step * dx;
         }
         return x;
     }
 
     // 4th order Runge-Kutta (RK4) method
-    inline ValueType RungeKutta4(Scalar time_span, Scalar step, const ValueType &x0)
+    inline State RungeKutta4(Scalar time_span,
+                                 Scalar step,
+                                 const State &x0,
+                                 const Control &u)
     {
-        ValueType x, k1, k2, k3, k4;
+        State x, k1, k2, k3, k4;
         for (x = x0; time_span > 0; time_span -= step) {
-            k1 = this->operator()(x);
-            k2 = this->operator()(x + step / 2 * k1);
-            k3 = this->operator()(x + step / 2 * k2);
-            k4 = this->operator()(x + step  * k3);
+            k1 = this->operator()(x, u);
+            k2 = this->operator()(x + step / 2 * k1, u);
+            k3 = this->operator()(x + step / 2 * k2, u);
+            k4 = this->operator()(x + step  * k3, u);
             x += step / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
         }
         return x;
@@ -50,15 +57,18 @@ public:
      * \param x0 initial value
      * \return integration result
      */
-    ValueType integrate(Scalar time_span, Scalar step, const ValueType &x0)
+    State integrate(Scalar time_span,
+                        Scalar step,
+                        const State &x0,
+                        const Control &u)
     {
         switch (mode) {
             case EULER:
-                return Euler(time_span, step, x0);
+                return Euler(time_span, step, x0, u);
 
             case RK4: // fall through
             default:
-                return RungeKutta4(time_span, step, x0);
+                return RungeKutta4(time_span, step, x0, u);
         }
     }
 };
