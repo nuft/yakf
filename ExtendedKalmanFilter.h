@@ -8,13 +8,15 @@ namespace kalmanfilter {
 template <typename Dynamics, typename Observation>
 class ExtendedKalmanFilter {
 public:
-    using Scalar = typename Dynamics::Scalar;
+    using Scalar = typename Dynamics::State::Scalar;
     using State = typename Dynamics::State;
     using Control = typename Dynamics::Control;
     using Measurement = typename Observation::Measurement;
-    using StateCov = Eigen::Matrix<Scalar, Dynamics::nx, Dynamics::nx>;
-    static constexpr unsigned nx = Dynamics::nx;
-    static constexpr unsigned nz = Observation::nz;
+    using StateCov = Eigen::Matrix<Scalar, State::RowsAtCompileTime, State::RowsAtCompileTime>;
+    enum {
+        nx = State::RowsAtCompileTime,
+        nz = Measurement::RowsAtCompileTime,
+    };
 
     NumericalIntegration<Dynamics> f;
     Observation h;
@@ -28,10 +30,10 @@ public:
 
     void predict(const Control &u, Scalar delta_t)
     {
-        typename Dynamics::Jacobian A;
+        Eigen::Matrix<Scalar, nx, nx> A;
         A.setIdentity();
 
-        A += delta_t*f.jacobian(x, u);
+        A += delta_t * f.jacobian(x, u);
         // todo: select integration time step
         x = f.integrate(delta_t, delta_t / 10, x, u);
         // x = A * x // simple alternative: one step euler forward method
@@ -41,11 +43,11 @@ public:
     void correct(const Measurement &z)
     {
         Measurement y;                      // innovation
-        Eigen::Matrix<Scalar, Observation::nz, Observation::nz> S;    // innovation covariance
+        Eigen::Matrix<Scalar, nz, nz> S;    // innovation covariance
         Eigen::Matrix<Scalar, nx, nz> K;    // Kalman gain
-        typename Observation::Jacobian H;   // jacobian of h
+        Eigen::Matrix<Scalar, nz, nx> H;    // jacobian of h
         Eigen::Matrix<Scalar, nx, nx> IKH;  // temporary matrix
-        Eigen::Matrix<Scalar, nx, nx> I;
+        Eigen::Matrix<Scalar, nx, nx> I;    // identity
         I.setIdentity();
 
         H = h.jacobian(x);
