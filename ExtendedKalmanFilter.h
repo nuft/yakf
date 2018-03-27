@@ -61,11 +61,10 @@ public:
          */
 
         /* variant 3
-           Eigen::Matrix<Scalar, nz, nx> A;
-           A = H*P.transpose();
-           // using S = S.transpose()
-           K = S.llt().solve(A).transpose();
-         */
+           S is symmetric positive definite
+           using S = S.transpose() and P = P.transpose()
+           K = S.llt().solve(H*P).transpose();
+        */
 
         y = z - h(x);
         IKH = (I - K * H);
