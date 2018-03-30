@@ -22,10 +22,13 @@ public:
     Observation h;
     State x; // state vector
     StateCov P; // state covariance
+    Eigen::Matrix<Scalar, nz, nz> S; // innovation covariance
+    Eigen::Matrix<Scalar, nx, nz> K; // Kalman gain
+    Eigen::Matrix<Scalar, nx, nx> I; // identity
 
     ExtendedKalmanFilter(State x0, StateCov P0): x(x0), P(P0)
     {
-
+        I.setIdentity();
     }
 
     void predict(const Control &u, Scalar delta_t)
@@ -43,12 +46,8 @@ public:
     void correct(const Measurement &z)
     {
         Measurement y;                      // innovation
-        Eigen::Matrix<Scalar, nz, nz> S;    // innovation covariance
-        Eigen::Matrix<Scalar, nx, nz> K;    // Kalman gain
         Eigen::Matrix<Scalar, nz, nx> H;    // jacobian of h
         Eigen::Matrix<Scalar, nx, nx> IKH;  // temporary matrix
-        Eigen::Matrix<Scalar, nx, nx> I;    // identity
-        I.setIdentity();
 
         H = h.jacobian(x);
         S = H * P * H.transpose() + h.R;
