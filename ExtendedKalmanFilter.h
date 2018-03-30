@@ -52,21 +52,9 @@ public:
 
         H = h.jacobian(x);
         S = H * P * H.transpose() + h.R;
-        K = P * H.transpose() * S.inverse();
 
-        /* variant 2
-           Eigen::Matrix<Scalar, nz, nz> Sinv;
-           Eigen::Matrix<Scalar, nz, nz> Iz;
-           Iz.setIdentity();
-           Sinv = S.llt().solve(Iz);
-           K = P * H.transpose() * Sinv;
-         */
-
-        /* variant 3
-           S is symmetric positive definite
-           using S = S.transpose() and P = P.transpose()
-           K = S.llt().solve(H*P).transpose();
-        */
+        // efficiently compute: K = P * H.transpose() * S.inverse();
+        K = S.llt().solve(H*P).transpose();
 
         y = z - h(x);
         IKH = (I - K * H);
