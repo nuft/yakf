@@ -2,10 +2,11 @@
 #define EXTENDED_KALMAN_FILTER_H
 
 #include <Eigen/Dense>
+#include "NumericalIntegration.h"
 
 namespace kalmanfilter {
 
-template <typename Dynamics, typename Observation>
+template <typename Dynamics, typename Observation, IntegrationMode mode = EULER>
 class ExtendedKalmanFilter {
 public:
     using Scalar = typename Dynamics::State::Scalar;
@@ -18,7 +19,7 @@ public:
         nz = Measurement::RowsAtCompileTime,
     };
 
-    NumericalIntegration<Dynamics> f;
+    NumericalIntegration<Dynamics, mode> f;
     Observation h;
     State x; // state vector
     StateCov P; // state covariance
