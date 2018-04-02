@@ -18,7 +18,7 @@ public:
         nz = Measurement::RowsAtCompileTime,
     };
 
-    Dynamics f;
+    NumericalIntegration<Dynamics> f;
     Observation h;
     State x; // state vector
     StateCov P; // state covariance
