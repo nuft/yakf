@@ -6,7 +6,16 @@
 
 namespace kalmanfilter {
 
-template <typename Dynamics, typename Observation, IntegrationMode mode = EULER>
+enum DiffMode {
+    ANALYTIC,
+    AUTOMATIC, // not supported
+    NUMERIC    // not supported
+};
+
+template <typename Dynamics,
+          typename Observation,
+          IntegrationMode int_mode = EULER,
+          DiffMode diff_mode = ANALYTIC>
 class ExtendedKalmanFilter {
 public:
     using Scalar = typename Dynamics::State::Scalar;
@@ -19,7 +28,8 @@ public:
         nz = Measurement::RowsAtCompileTime,
     };
 
-    NumericalIntegration<Dynamics, mode> f;
+    static_assert(diff_mode == ANALYTIC, "Unsupported DiffMode");
+    NumericalIntegration<Dynamics, int_mode> f;
     Observation h;
     State x; // state vector
     StateCov P; // state covariance
