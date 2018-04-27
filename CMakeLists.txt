@@ -21,6 +21,7 @@ add_executable(
     tests
     test/main.cpp
     test/NumericalIntegrationTest.cpp
+    test/ExtendedKalmanFilterTest.cpp
     )
 
 target_link_libraries(
