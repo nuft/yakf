@@ -21,14 +21,14 @@ public:
 private:
     // Explicit Euler method
     inline State Euler(Scalar time_span,
-                           unsigned nb_steps,
-                           const State &x0,
-                           const Control &u)
+                       unsigned nb_steps,
+                       const State &x0,
+                       const Control &u)
     {
-        /** @todo update implemenation */
-        State x, dx;
-        for (x = x0; time_span > 0; time_span -= step) {
-            dx = this->operator()(x, u);
+        State x;
+        const Scalar step = time_span / nb_steps;
+        for (x = x0; nb_steps > 0; nb_steps--) {
+            State dx = this->operator()(x, u);
             x += step * dx;
         }
         return x;
@@ -36,13 +36,13 @@ private:
 
     // 4th order Runge-Kutta (RK4) method
     inline State RungeKutta4(Scalar time_span,
-                                 unsigned nb_steps,
-                                 const State &x0,
-                                 const Control &u)
+                             unsigned nb_steps,
+                             const State &x0,
+                             const Control &u)
     {
-        /** @todo update implemenation */
         State x, k1, k2, k3, k4;
-        for (x = x0; time_span > 0; time_span -= step) {
+        const Scalar step = time_span / nb_steps;
+        for (x = x0; nb_steps > 0; nb_steps--) {
             k1 = this->operator()(x, u);
             k2 = this->operator()(x + step / 2 * k1, u);
             k3 = this->operator()(x + step / 2 * k2, u);
@@ -60,9 +60,9 @@ public:
      * \return integration result
      */
     State integrate(Scalar time_span,
-                    unsigned nb_steps = 1,
                     const State &x0,
-                    const Control &u)
+                    const Control &u,
+                    unsigned nb_steps = 1)
     {
         switch (mode) {
             case EULER:
