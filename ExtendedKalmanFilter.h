@@ -24,10 +24,11 @@ public:
     using Measurement = typename Observation::Measurement;
     using StateCov = Eigen::Matrix<Scalar, State::RowsAtCompileTime, State::RowsAtCompileTime>;
     enum {
-        nx=State::RowsAtCompileTime,
-        nz=Measurement::RowsAtCompileTime,
+        nx = State::RowsAtCompileTime,
+        nz = Measurement::RowsAtCompileTime,
     };
 
+private:
     static_assert(diff_mode == ANALYTIC, "Unsupported DiffMode");
     NumericalIntegration<Dynamics, int_mode> f;
     Observation h;
@@ -37,9 +38,20 @@ public:
     Eigen::Matrix<Scalar, nx, nz> K; // Kalman gain
     Eigen::Matrix<Scalar, nx, nx> I; // identity
 
+public:
     ExtendedKalmanFilter(State x0, StateCov P0) : x(x0), P(P0)
     {
         I.setIdentity();
+    }
+
+    State get_state()
+    {
+        return x;
+    }
+
+    StateCov get_covariance()
+    {
+        return P;
     }
 
     void predict(const Control &u, Scalar delta_t, unsigned integration_steps = 1)
