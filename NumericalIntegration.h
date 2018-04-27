@@ -55,8 +55,9 @@ private:
 public:
     /** Integrate given functor
      * \param time_span integration time span
-     * \param step integration time step
      * \param x0 initial value
+     * \param u control input
+     * \param nb_steps number of integration steps
      * \return integration result
      */
     State integrate(Scalar time_span,
