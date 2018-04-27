@@ -24,8 +24,8 @@ public:
     using Measurement = typename Observation::Measurement;
     using StateCov = Eigen::Matrix<Scalar, State::RowsAtCompileTime, State::RowsAtCompileTime>;
     enum {
-        nx = State::RowsAtCompileTime,
-        nz = Measurement::RowsAtCompileTime,
+        nx=State::RowsAtCompileTime,
+        nz=Measurement::RowsAtCompileTime,
     };
 
     static_assert(diff_mode == ANALYTIC, "Unsupported DiffMode");
@@ -37,20 +37,18 @@ public:
     Eigen::Matrix<Scalar, nx, nz> K; // Kalman gain
     Eigen::Matrix<Scalar, nx, nx> I; // identity
 
-    ExtendedKalmanFilter(State x0, StateCov P0): x(x0), P(P0)
+    ExtendedKalmanFilter(State x0, StateCov P0) : x(x0), P(P0)
     {
         I.setIdentity();
     }
 
-    void predict(const Control &u, Scalar delta_t)
+    void predict(const Control &u, Scalar delta_t, unsigned integration_steps = 1)
     {
         Eigen::Matrix<Scalar, nx, nx> A;
-        A.setIdentity();
 
-        A += delta_t * f.jacobian(x, u);
-        // todo: select integration time step
-        x = f.integrate(delta_t, delta_t / 10, x, u);
-        // x = A * x // simple alternative: one step euler forward method
+        A = I + delta_t * f.jacobian(x, u);
+
+        x = f.integrate(delta_t, x, u, integration_steps);
         P = A * P * A.transpose() + f.Q;
     }
 
@@ -64,7 +62,7 @@ public:
         S = H * P * H.transpose() + h.R;
 
         // efficiently compute: K = P * H.transpose() * S.inverse();
-        K = S.llt().solve(H*P).transpose();
+        K = S.llt().solve(H * P).transpose();
 
         y = z - h(x);
         IKH = (I - K * H);
@@ -74,9 +72,12 @@ public:
         P = IKH * P * IKH.transpose() + K * h.R * K.transpose();
     }
 
-    State update(const Control &u, const Measurement &z, Scalar delta_t)
+    State update(const Control &u,
+                 const Measurement &z,
+                 Scalar delta_t,
+                 unsigned integration_steps = 1)
     {
-        predict(u, delta_t);
+        predict(u, delta_t, integration_steps);
         correct(z);
         return x;
     }
