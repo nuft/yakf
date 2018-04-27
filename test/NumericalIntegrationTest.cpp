@@ -4,14 +4,14 @@
 
 using namespace kalmanfilter;
 
-using Vec1d = double;
+using Vec1d = Eigen::Matrix<double, 1, 1>;
 
 struct ZeroDynamics
 {
-    using State = double;
+    using State = Vec1d;
     using Control = double;
     using Scalar = double;
-    double operator()(const double &x, const double &u) const {return 0.0;}
+    Vec1d operator()(const Vec1d &x, const double &u) const {Vec1d xd(0.0); return xd;}
 };
 
 TEST(EulerTestCase, TestZeroDynamics) {
@@ -32,10 +32,10 @@ TEST(RungeKuttaTestCase, TestZeroDynamics) {
 
 struct ConstDynamics
 {
-    using State = double;
+    using State = Vec1d;
     using Control = double;
     using Scalar = double;
-    double operator()(const double &x, const double &u) const {return 21.0;}
+    Vec1d operator()(const Vec1d &x, const double &u) const {Vec1d xd(21.0); return xd;}
 };
 
 TEST(EulerTestCase, TestConstDynamics) {
@@ -43,7 +43,7 @@ TEST(EulerTestCase, TestConstDynamics) {
     Vec1d res;
     const Vec1d x0(0);
     res = f.integrate(2, x0, 0.0, 1000);
-    EXPECT_NEAR(42.0, res, 0.1);
+    EXPECT_NEAR(42.0, res[0], 0.1);
 }
 
 TEST(RungeKuttaTestCase, TestConstDynamics) {
@@ -51,7 +51,7 @@ TEST(RungeKuttaTestCase, TestConstDynamics) {
     Vec1d res;
     const Vec1d x0(0);
     res = f.integrate(2, x0, 0.0, 1000);
-    EXPECT_NEAR(42.0, res, 0.1);
+    EXPECT_NEAR(42.0, res[0], 0.1);
 }
 
 using Vec2d = Eigen::Vector2d;

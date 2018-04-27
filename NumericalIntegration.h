@@ -17,7 +17,7 @@ class NumericalIntegration : public Functor {
 public:
     using State = typename Functor::State;
     using Control = typename Functor::Control;
-    using Scalar = typename Functor::Scalar;
+    using Scalar = typename Functor::State::Scalar;
 private:
     // Explicit Euler method
     inline State Euler(Scalar time_span,
